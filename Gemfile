@@ -1,6 +1,12 @@
-source "https://rubygems.org"
+# frozen_string_literal: true
+#
+# Copyright 2017 Holger Just
+#
+# This software may be modified and distributed under the terms
+# of the MIT license. See the LICENSE.txt file for details.
 
-git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
+source 'https://rubygems.org'
 
-# Specify your gem's dependencies in rackstash-sinatra.gemspec
-gemspec
+gemspec name: 'rackstash-sinatra'
+
+gem 'rackstash', path: File.expand_path('../rackstash', __dir__)

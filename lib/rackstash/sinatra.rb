@@ -1,4 +1,4 @@
-require "rackstash/sinatra/version"
+require 'rackstash/sinatra/version'
 
 module Rackstash
   module Sinatra
