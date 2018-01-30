@@ -8,6 +8,7 @@
 require 'rackstash/rack'
 
 require 'rackstash/sinatra/middleware'
+require 'rackstash/sinatra/silence_common_logger'
 require 'rackstash/sinatra/version'
 
 module Rackstash
@@ -136,6 +137,16 @@ module Rackstash
       app.set :rackstash_request_tags, nil
       app.set :rackstash_response_fields, nil
       app.set :rackstash_response_tags, nil
+
+      # Ensure that any Rack::CommonLogger instances are silent if there is a
+      # `Rackstash::Sinatra::Middleware` instance in the same middleware stack.
+      #
+      # This is needed since Rack adds a `Rack::CommonLogger` to the middleware
+      # stack in its development and deployment environments which we don't
+      # control. Sinatra itself solves this by silencing its "secondary" common
+      # logger. Since we want to completely replace Rack's own logger, we have
+      # to use slightly more intrusive methods unfortunately.
+      Rackstash::Sinatra::SilenceCommonLogger.apply
     end
 
     private
