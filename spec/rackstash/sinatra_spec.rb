@@ -84,6 +84,8 @@ RSpec.describe Rackstash::Sinatra do
     it 'logs to STDOUT' do
       stdout = StringIO.new
       stub_const("::STDOUT", stdout)
+      # This is enabled for non-test environments by default
+      app.enable :logging
 
       expect(perform_request).to eql 200
       expect(env['rack.logger']).to be_a Rackstash::Logger
@@ -95,6 +97,8 @@ RSpec.describe Rackstash::Sinatra do
     it 'uses INFO level by default' do
       stdout = StringIO.new
       stub_const("::STDOUT", stdout)
+      # This is enabled for non-test environments by default
+      app.enable :logging
 
       perform_request
 
@@ -107,7 +111,7 @@ RSpec.describe Rackstash::Sinatra do
 
   describe '.logging' do
     it 'can disable rackstash logging' do
-      app.set :logging, false
+      app.disable :logging
 
       perform_request
 
@@ -116,15 +120,12 @@ RSpec.describe Rackstash::Sinatra do
     end
 
     it 'sets the log level' do
-      stdout = StringIO.new
-      stub_const("::STDOUT", stdout)
+      stub_const("::STDOUT", StringIO.new)
       app.set :logging, Rackstash::DEBUG
 
       perform_request
 
       expect(env['rack.logger']).to be_a Rackstash::Logger
-      expect(env['rack.logger'].flows.first.adapter).to be_a Rackstash::Adapter::IO
-
       expect(env['rack.logger'].level).to eql 0
     end
   end
@@ -133,6 +134,8 @@ RSpec.describe Rackstash::Sinatra do
     it 'logs to STDOUT by default' do
       stdout = StringIO.new
       stub_const("::STDOUT", stdout)
+      # This is enabled for non-test environments by default
+      app.enable :logging
 
       expect(perform_request).to eql 200
       expect(stdout.string).to match %r|\A{.+"message":"Hello\\n".+}\n\z|
