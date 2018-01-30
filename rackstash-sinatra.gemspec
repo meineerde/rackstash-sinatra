@@ -33,7 +33,11 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.1.0'
 
   spec.add_dependency 'rackstash', '~> 0.2.0-dev'
-  spec.add_dependency 'sinatra'
+  # Technically, we could probably support much older versions of Sinatra.
+  # Unless there is a specific need (in which case you should open an issue), we
+  # try to restrict our support effort to a "recent" version though (with
+  # Sinatra 1.4.0 being released in 2013 already)
+  spec.add_dependency 'sinatra', '>= 1.4.0'
 
   spec.add_development_dependency 'bundler', '~> 1.12'
   spec.add_development_dependency 'rake', '~> 10.0'
