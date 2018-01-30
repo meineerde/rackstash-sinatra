@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 #
-# Copyright 2017 Holger Just
+# Copyright 2017 - 2018 Holger Just
 #
 # This software may be modified and distributed under the terms
 # of the MIT license. See the LICENSE.txt file for details.
@@ -16,6 +16,10 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'Sinatra integration for Rackstash'
   spec.description   = <<-TXT.gsub(/\s+|\n/, ' ').strip
+  Integrate Rackstash into your Sinatra application to provide unified and
+  flexible logs for each request. You can add additional data to each log event
+  which provides increased observability into your app. Using a log server like
+  Logstash or Graylog, you can store, query and analyze the logs.
   TXT
   spec.homepage      = 'https://github.com/meineerde/rackstash-sinatra'
   spec.license       = 'MIT'
