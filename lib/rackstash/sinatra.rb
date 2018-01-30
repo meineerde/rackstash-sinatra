@@ -147,6 +147,15 @@ module Rackstash
       # logger. Since we want to completely replace Rack's own logger, we have
       # to use slightly more intrusive methods unfortunately.
       Rackstash::Sinatra::SilenceCommonLogger.apply
+
+      # The access logs are disable by default when starting the server via Rack
+      # (e.g. with the `rackup` command and a `config.ru` file). When starting
+      # the server directly from Sinatra with e.g. `ruby app.rb`, the default
+      # options of Rack are not used. We thus have to provide our own sensible
+      # defaults to disable the unecessary default access logs of WEBrick in all
+      # cases.
+      app.set :server_settings, {} unless app.settings.respond_to?(:server_settings)
+      app.server_settings[:AccessLog] ||= [] if app.server_settings.respond_to?(:[]=)
     end
 
     private
