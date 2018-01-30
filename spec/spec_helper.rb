@@ -19,15 +19,19 @@ if ENV['COVERAGE']
   end
 
   SimpleCov.start do
-    project_name 'Rackstash'
+    project_name 'Rackstash::Sinatra'
     add_filter '/spec/'
   end
 end
 
-require 'bundler/setup'
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'rackstash/sinatra'
 
+require_relative 'spec_helper/sinatra_app'
+
 RSpec.configure do |config|
+  config.include SpecHelper::SinatraApp
+
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = '.rspec_status'
 
