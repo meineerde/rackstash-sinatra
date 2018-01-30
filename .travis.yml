@@ -1,5 +1,50 @@
-sudo: false
+# Copyright 2017 - 2018 Holger Just
+#
+# This software may be modified and distributed under the terms
+# of the MIT license. See the LICENSE.txt file for details.
+
 language: ruby
+sudo: false
+dist: trusty
+
+cache: bundler
+
 rvm:
+  # Latest Rubies on top
+  - 2.5.0
+  - jruby-9.1.15.0
+
+  # Older versions
   - 2.4.2
-before_install: gem install bundler -v 1.15.4
+  - 2.3.6
+  - 2.2.9
+  - 2.1.10
+  - jruby-9.0.5.0
+
+  # HEAD-Rubies (might break)
+  - ruby-head
+  - jruby-head
+
+env:
+  global:
+    # Only test against Rackstash master until we have the first release of
+    # Rackstash version 0.2
+    RACKSTASH_VERSION: master
+  matrix:
+    - SINATRA_VERSION: '2.0.0'
+    - SINATRA_VERSION: '1.4.8'
+
+matrix:
+  include:
+    - rvm: 2.5.0
+      env: COVERAGE=1
+
+  allow_failures:
+    - rvm: ruby-head
+    - rvm: jruby-head
+
+before_install:
+  - "gem install bundler"
+
+script:
+  - bundle exec rspec
