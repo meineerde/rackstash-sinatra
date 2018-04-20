@@ -69,13 +69,6 @@ module Rackstash
   #   (e.g. an `IO` object or the name of a log file) which can be used to
   #   create a suitable Rackstash adapter with a new `Rackstash::Logger` object
   #   for use by the middleware.
-  # * `rackstash_buffering => Symbol, Boolean` - defines the buffering mode of
-  #   buffers created by the {Rackstash::Sinatra::Middleware} for each request.
-  #   You can set it to `:full` to emit only a single log event per request, to
-  #   `:data` to accumulate fields and tags on the request's buffer but to emit
-  #   a new log event per logged message, or to `:none` to emit log events for
-  #   each message and to clear the buffer afterwards. See the Rackstash
-  #   documentation of `Rackstash::Buffer#buffering` for details.
   # * `rackstash_request_fields => Hash<#to_s, => Proc, Object>, Fields::Hash, Proc` -
   #   Additional fields to merge into the emitted log event before processing
   #   the request. If the object itself or any of its hash values is a `Proc`,
@@ -115,13 +108,15 @@ module Rackstash
   # enable that, you configure the Rackstash logger to output only the messages
   # as soon as they are logged. A suitable configuration can look like this:
   #
+  #     # First, we define a suitable Rackstash logger
   #     logger = Rackstash::Logger.new(STDOUT, level: Rackstash::INFO) do |flow|
   #       flow.encoder Rackstash::Encoder::Message.new(['@timestamp'])
+  #       flow.auto_flush!
   #     end
-  #
-  #     set :logging, true
   #     set :rackstash, logger
-  #     set :rackstash_buffering, :data
+  #
+  #     # Then, we enable logging in Sinatra
+  #     set :logging, true
   module Sinatra
     # Callback method called by Sinatra when registering this class as a plugin
     # in a Sinatra application. Here, we are setting the default values for
@@ -131,7 +126,6 @@ module Rackstash
     # @return [void]
     def self.registered(app)
       app.set :rackstash, STDOUT
-      app.set :rackstash_buffering, :full
 
       app.set :rackstash_request_fields, nil
       app.set :rackstash_request_tags, nil
@@ -152,8 +146,8 @@ module Rackstash
       # (e.g. with the `rackup` command and a `config.ru` file). When starting
       # the server directly from Sinatra with e.g. `ruby app.rb`, the default
       # options of Rack are not used. We thus have to provide our own sensible
-      # defaults to disable the unecessary default access logs of WEBrick in all
-      # cases.
+      # defaults to disable the unnecessary default access logs of WEBrick in
+      # all cases.
       app.set :server_settings, {} unless app.settings.respond_to?(:server_settings)
       app.server_settings[:AccessLog] ||= [] if app.server_settings.respond_to?(:[]=)
     end
@@ -191,7 +185,6 @@ module Rackstash
       builder.use(
         Rackstash::Sinatra::Middleware,
         logger,
-        buffering: rackstash_buffering,
         request_fields: rackstash_request_fields,
         request_tags: rackstash_request_tags,
         response_fields: rackstash_response_fields,

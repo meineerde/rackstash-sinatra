@@ -32,7 +32,6 @@ RSpec.describe Rackstash::Sinatra do
 
     it 'sets default settings' do
       expect(app.rackstash).to equal STDOUT
-      expect(app.rackstash_buffering).to eql :full
       expect(app.rackstash_request_fields).to be_nil
       expect(app.rackstash_request_tags).to be_nil
       expect(app.rackstash_response_fields).to be_nil
@@ -163,40 +162,6 @@ RSpec.describe Rackstash::Sinatra do
       expect(perform_request).to eql 200
       expect(env['rack.logger']).to equal logger
       expect(stream.string).to match %r|\A{.+"message":"Hello\\n".+}\n\z|
-    end
-  end
-
-  describe '.rackstash_buffering' do
-    let(:app) {
-      sinatra_app(sinatra_base) do
-        get '/' do
-          logger.info('Starting...')
-          logger.warn('Hello')
-          logger.info('All done')
-        end
-      end
-    }
-
-    it 'can output multiple messages' do
-      stream = StringIO.new
-      adapter = Rackstash::Adapter[stream]
-
-      logger = Rackstash::Logger.new(adapter) do
-        encoder Rackstash::Encoder::Message.new
-      end
-      app.rackstash = logger
-      app.enable :logging
-
-      # Write each message individually plus the final "empty" message
-      app.rackstash_buffering = :data
-      expect(adapter).to receive(:write).exactly(4).times.and_call_original
-
-      expect(perform_request).to eql 200
-      expect(stream.string.each_line.to_a).to eql [
-        "Starting...\n",
-        "Hello\n",
-        "All done\n"
-      ]
     end
   end
 
