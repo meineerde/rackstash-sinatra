@@ -14,7 +14,7 @@ def from_env(env, repository)
   when /\d+\.\d/
     "~> #{ENV[env]}"
   when /\A[.\/]/
-    { path: File.join(Dir.pwd, ENV[env]) }
+    { path: File.expand_path(ENV[env]) }
   when nil, ''
     nil
   else
